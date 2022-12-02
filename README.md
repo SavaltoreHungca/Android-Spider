@@ -61,7 +61,7 @@ print(rsp.text[0: 300] + '...')
 ```
 Output:
 ```
-you fetched data in below: 
+you fetched data printed below: 
 ["news. Did physicists create a wormhole in a quantum computer?. An unusual teleportation experiment is just ordinary quantum physics, but was inspired by tunnels through an exotic ‘toy universe’. ","Heralded Alzheimer’s drug works — but safety concerns loom. Eisai and Biogen share clinical trial da...
 ```
 
