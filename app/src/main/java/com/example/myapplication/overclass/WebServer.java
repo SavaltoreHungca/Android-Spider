@@ -118,6 +118,7 @@ public class WebServer extends NanoHTTPD {
 
                 boolean rlt = Helper.terminateWhenReturnTrue(() -> {
                     Helper.webViewLoadPage(getWebView(pageId), requestUrl);
+                    Helper.sleep(1000);
                     return Helper.webViewExecuteJS(getWebView(pageId), "function(){if(location.hostname !== 'localhost' && location.hostname !== '127.0.0.1'){ return 'ok';};}", true).success;
                 }, 3);
                 if (!rlt) {
