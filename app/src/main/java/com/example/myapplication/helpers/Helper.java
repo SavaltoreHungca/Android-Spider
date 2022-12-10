@@ -3,6 +3,7 @@ package com.example.myapplication.helpers;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.http.SslError;
+import android.os.Build;
 import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceError;
@@ -29,6 +30,9 @@ public class Helper {
 
     public static MyWebView createWebView(Context context) {
         MyWebView webView = new MyWebView(context);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            MyWebView.setWebContentsDebuggingEnabled(true);
+        }
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
@@ -225,6 +229,10 @@ public class Helper {
     }
 
     public static ExeJsRlt webViewExecuteJS(MyWebView webView, String function, boolean asyncWay) {
+        return webViewExecuteJS(webView, function, asyncWay, 5000, 200);
+    }
+
+    public static ExeJsRlt webViewExecuteJS(MyWebView webView, String function, boolean asyncWay, long waitTime, long loopInterval) {
         VC<String> rltReceiver = new VC<>();
         VC<String> isok = new VC<>("");
         webView.setRunokcheck(isok);
@@ -235,7 +243,7 @@ public class Helper {
             webView.post(() -> {
                 try {
                     if (asyncWay) {
-                        webView.loadUrl("javascript:(function(){var count = 0; window.loop = function () {if (count > 50) {throw new Error();}; var userfunctionexexrlt = null; try{ userfunctionexexrlt = (" + function + ")();}catch(e){};if(userfunctionexexrlt){RltReceiver.send(userfunctionexexrlt);RltReceiver.isok('ok');}else{window.setTimeout(loop, 200);}; count++; };window.setTimeout(loop, 500);})();");
+                        webView.loadUrl("javascript:(function(){var count = 0; window.loop = function () {if (count > 50) {throw new Error();}; var userfunctionexexrlt = null; try{ userfunctionexexrlt = (" + function + ")();}catch(e){};if(userfunctionexexrlt){RltReceiver.send(userfunctionexexrlt);RltReceiver.isok('ok');}else{window.setTimeout(loop, " + loopInterval + ");}; count++; };window.setTimeout(loop, 10);})();");
                     } else {
                         webView.loadUrl("javascript:(function(){RltReceiver.send((" + function + ")());RltReceiver.isok('ok');})();");
                     }
@@ -245,7 +253,7 @@ public class Helper {
             });
         };
         submit.run();
-        Helper.tillEq(isok, "ok", 5000, () -> {
+        Helper.tillEq(isok, "ok", waitTime, () -> {
             if (meetException.get()) {
                 submit.run();
             }

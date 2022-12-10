@@ -81,6 +81,9 @@ public class WebServer extends NanoHTTPD {
             VC<String> needRefresh = new VC<>(getFormValue(jsonObject, "needRefresh"));
             String retryTimes = getFormValue(jsonObject, "retryTimes");
             String function = getFormValue(jsonObject, "function");
+            String waitTime = getFormValue(jsonObject, "waitTime");
+            String loopInterval = getFormValue(jsonObject, "loopInterval");
+
 
             if (singleWebViewMode) {
                 lock.lock();
@@ -151,7 +154,14 @@ public class WebServer extends NanoHTTPD {
             }
             ExeJsRlt rlt;
             do {
-                rlt = Helper.webViewExecuteJS(getWebView(pageId), function, !"".equals(asyncWay));
+                if ("".equals(waitTime)) {
+                    rlt = Helper.webViewExecuteJS(getWebView(pageId), function, !"".equals(asyncWay));
+                } else {
+                    if("".equals(loopInterval)){
+                        loopInterval = "200";
+                    }
+                    rlt = Helper.webViewExecuteJS(getWebView(pageId), function, !"".equals(asyncWay), Long.parseLong(waitTime), Long.parseLong(loopInterval));
+                }
                 execTimes--;
             } while (execTimes > 0 && !rlt.success);
 
